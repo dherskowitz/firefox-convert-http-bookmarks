@@ -8,13 +8,17 @@
     <title>Convert Bookmarks To HTTPS</title>
 </head>
 <body>
-    <h2 id="title">Found <span id="title__count"></span> HTTP Link(s)</h2>
+    <div id="main">
+        <h2 id="title">Found <span id="title__count"></span> HTTP Link(s)</h2>
+    
+        <button id="convertBtnTop">Convert All</button>
+    
+        <div id="toConvert"></div>
+    
+        <button id="convertBtnBottom">Convert All</button>
+    </div>
 
-    <button id="convertBtnTop">Convert All</button>
-
-    <div id="toConvert"></div>
-
-    <button id="convertBtnBottom">Convert All</button>
+    <div id="success" class="hide">All HTTP bookmarks converted sucessfully!</div>
 
     <script src="script.js"></script>
 </body>

@@ -4,6 +4,8 @@ const convert_btn_bottom = document.querySelector("#convertBtnBottom");
 const to_convert = document.querySelector("#toConvert");
 const title = document.querySelector("#title");
 const title_count = document.querySelector("#title__count");
+const main = document.querySelector("#main");
+const success = document.querySelector("#success");
 const regex = new RegExp('^http:\/\/[^ "]+$');
 
 function convertBookmark(id) {
@@ -13,7 +15,7 @@ function convertBookmark(id) {
         const bookmark = browser.bookmarks.get(id);
         bookmark.then((item) => browser.bookmarks.update(id, {url: item[0].url.replace('http', 'https')}));
         toRemove.parentNode.removeChild(toRemove);
-        title_count.innerHTML = parseInt(title_count.textContent) - 1;
+        title_count.textContent = parseInt(title_count.textContent) - 1;
     }, 200);
 }
 
@@ -25,7 +27,8 @@ function convertAllBookmarks(all_bookmarks) {
         const bookmark_to_convert = browser.bookmarks.get(bookmark.id);
         bookmark_to_convert.then((item) => browser.bookmarks.update(bookmark.id, {url: item[0].url.replace('http', 'https')}));
     })
-    body.innerHTML = "<div>All HTTP bookmarks converted sucessfully!</div>";
+    main.style.display = "none";
+    success.classList.remove("hide");
     body.classList.remove("disabled");
 }
 
@@ -33,14 +36,34 @@ function findHttpBookmarks(bookmarkItems) {
     const http_bookmarks = bookmarkItems.filter(item => item.url && regex.test(item.url));
 
     let links = []
+    let list = document.createElement("div");
 
     http_bookmarks.forEach(item => {
-        links.push(`<div class="link"><div class="link__title">${item.title}</div><div class="link__url">${item.url}</div><button id="${item.id}" class="link__button">Convert Link</button></div>`);
+        let list_item = document.createElement("div");
+        list_item.setAttribute("class", "link");
+
+        let item_title = document.createElement("div");
+        item_title.setAttribute("class", "link__title");
+        item_title.textContent = item.title;
+
+        let item_url = document.createElement("div");
+        item_url.setAttribute("class", "link__url");
+        item_url.textContent = item.url;
+
+        let item_button = document.createElement("button");
+        item_button.setAttribute("class", "link__button");
+        item_button.setAttribute("id", item.id);
+        item_button.textContent = "Convert Link";
+
+        list_item.appendChild(item_title);
+        list_item.appendChild(item_url);
+        list_item.appendChild(item_button);
+        list.appendChild(list_item);
     });
 
-    toConvert.innerHTML = links.join("");
+    toConvert.appendChild(list)
 
-    title_count.innerHTML = http_bookmarks.length
+    title_count.textContent = http_bookmarks.length
     title.classList.add("show");
 
     if (http_bookmarks.length > 0) {
