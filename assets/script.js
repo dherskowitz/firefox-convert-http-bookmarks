@@ -8,17 +8,25 @@ const main = document.querySelector("#main");
 const success = document.querySelector("#success");
 const regex = new RegExp('^http:\/\/[^ "]+$');
 
+// Conver a specific bookmark to https
 function convertBookmark(id) {
     const toRemove = document.querySelector(`#${id}`).parentNode;
     toRemove.classList.add("disabled");
     setTimeout(() => {
         const bookmark = browser.bookmarks.get(id);
         bookmark.then((item) => browser.bookmarks.update(id, {url: item[0].url.replace('http', 'https')}));
-        toRemove.parentNode.removeChild(toRemove);
-        title_count.textContent = parseInt(title_count.textContent) - 1;
+        toRemove.parentNode.removeChild(toRemove); // remove item from list
+        title_count.textContent = parseInt(title_count.textContent) - 1; // update count
+
+        // hide buttons if no more links in list
+        if (parseInt(title_count.textContent)  === 0) {
+            convert_btn_top.classList.add("hide");
+            convert_btn_bottom.classList.add("hide");
+        }
     }, 200);
 }
 
+// convert all http bookmarks to https
 function convertAllBookmarks(all_bookmarks) {
     const to_convert = all_bookmarks.filter(item => item.url && regex.test(item.url));
     body.classList.add("disabled");
@@ -32,12 +40,13 @@ function convertAllBookmarks(all_bookmarks) {
     body.classList.remove("disabled");
 }
 
+// create list of http bookmarks and show in popup
 function findHttpBookmarks(bookmarkItems) {
     const http_bookmarks = bookmarkItems.filter(item => item.url && regex.test(item.url));
 
-    let links = []
-    let list = document.createElement("div");
+    let list = document.createElement("div"); // create list container
 
+    // loop and create each list item
     http_bookmarks.forEach(item => {
         let list_item = document.createElement("div");
         list_item.setAttribute("class", "link");
@@ -61,11 +70,12 @@ function findHttpBookmarks(bookmarkItems) {
         list.appendChild(list_item);
     });
 
-    toConvert.appendChild(list)
+    toConvert.appendChild(list) // append list to popup
 
-    title_count.textContent = http_bookmarks.length
+    title_count.textContent = http_bookmarks.length // set count
     title.classList.add("show");
 
+    // only show/run if any http bookmarks were found
     if (http_bookmarks.length > 0) {
         convert_btn_top.classList.add("show");
         convert_btn_bottom.classList.add("show");
@@ -93,6 +103,7 @@ function searchAllBookmarks() {
 convert_btn_top.addEventListener("click", searchAllBookmarks);
 convert_btn_bottom.addEventListener("click", searchAllBookmarks);
 
+// on popup open find http bookmarks and show user
 browser.tabs.executeScript({file: "/assets/script.js"})
 .then(searchBookmarks)
 .catch(err => console.log(err));
